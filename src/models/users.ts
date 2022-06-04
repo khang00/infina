@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 import Orders from "./orders";
 
 const UsersSchema = new mongoose.Schema({
-  fullName: String,
+  full_name: String,
   phone: String,
-  age: String,
-  gender: Number,
+  age: Number,
+  gender: String,
   orders: [Orders.OrdersSchema],
 });
 
-const UsersModel = new mongoose.Model("Users", UsersSchema);
+const UsersModel = mongoose.model("Users", UsersSchema);
 
 export default { UsersModel, UsersSchema };
