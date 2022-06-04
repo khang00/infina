@@ -1,24 +1,39 @@
 import mongoose from "mongoose";
 import express from "express";
 import saving from "./services/saving";
+import {graphqlHTTP} from "express-graphql";
+import {buildSchema} from "graphql";
+import {ApolloServer} from "apollo-server-express";
+import {GraphQLFileLoader} from "@graphql-tools/graphql-file-loader";
+import {loadSchema} from "@graphql-tools/load";
 
-(async () => {
-  const port = 3000;
+const port = 3000;
+mongoose.connect(
+  "mongodb+srv://KhangDang:JRbjiD07mtOlb1WS@cluster0.78n8d.mongodb.net/?retryWrites=true&w=majority",
+  async () => {
+    console.log("connect to database successfully");
 
-  mongoose.connect(
-    "mongodb+srv://KhangDang:JRbjiD07mtOlb1WS@cluster0.78n8d.mongodb.net/?retryWrites=true&w=majority",
-    () => {
-      console.log("connect to database successfully");
-    }
-  );
 
-  const app = express();
-  app.use(express.json())
-  app.post("/api/v1/users", saving.createUser);
-  app.put("/api/v1/users", saving.updateUser);
-  app.get("/api/v1/users", saving.getUser);
+    const schema = await loadSchema("./**/*.graphql", {
+      loaders: [new GraphQLFileLoader()]
+    })
 
-  app.listen(port, () => {
-    console.log("server start successfully");
-  });
-})();
+    const resolvers = {
+      Query: {
+        hello: () => 'Hello world!',
+      },
+    };
+
+    const server = new ApolloServer({ schema, resolvers });
+    const app = express();
+    await server.start()
+    server.applyMiddleware({ app });
+    app.listen(port, () => {
+      console.log("server start successfully");
+    });
+  }
+);
+
+/*app.post("/api/v1/users", saving.createUser);
+    app.put("/api/v1/users", saving.updateUser);
+    app.get("/api/v1/users", saving.getUser);*/
