@@ -3,6 +3,8 @@ import Users from "../models/users";
 import {ObjectIDResolver} from "graphql-scalars";
 import Orders from "../models/orders";
 import calculateAccruedAmount from "./order";
+import {UserInputError} from "apollo-server-express";
+import validatePhoneNumber from "./user";
 
 const resolvers: Resolvers = {
   ObjectID: ObjectIDResolver,
@@ -13,7 +15,7 @@ const resolvers: Resolvers = {
     async getOrderById(_, {_id}) {
       const order = await Orders.OrdersModel.findById(_id).exec()
       if (!order) {
-        return {}
+        throw new UserInputError("not found oder for id" + _id)
       }
 
       const monthSpan = new Date().getMonth() - new Date(order.createdAt).getMonth()
@@ -30,7 +32,7 @@ const resolvers: Resolvers = {
     async getOrderByUser(_, {user}) {
       const orders = await Orders.OrdersModel.find({user: user}).exec()
       if (!orders) {
-        return []
+        throw new UserInputError("not found oder for user" + user)
       }
 
       return orders.map(order => {
@@ -49,17 +51,36 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     async createUser(_, {user}) {
+      if (user.phone && !validatePhoneNumber(user.phone)) {
+        throw new UserInputError("wrong phone number format" + user.phone)
+      }
+
       return await Users.UsersModel.create(user)
     },
     async updateUser(_, {user}) {
+      if (user.phone && !validatePhoneNumber(user.phone)) {
+        throw new UserInputError("wrong phone number format" + user.phone)
+      }
+
       return await Users.UsersModel.findByIdAndUpdate(user._id, user).exec()
     },
     async createOrder(_, {order}) {
       const user = await Users.UsersModel.findById(order.user).exec()
       if (!user) {
-        return {}
+        throw new UserInputError("user not exist" + order.user)
       }
-      return await Orders.OrdersModel.create(order)
+
+      const createdOrder = await Orders.OrdersModel.create(order)
+      const monthSpan = new Date().getMonth() - new Date(createdOrder.createdAt).getMonth()
+      return {
+        _id: createdOrder._id,
+        user: createdOrder.user,
+        code: createdOrder.code,
+        age: createdOrder.age,
+        gender: createdOrder.gender,
+        interest_rate: order.interest_rate,
+        accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+      }
     }
   }
 }
