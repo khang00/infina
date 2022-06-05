@@ -19,6 +19,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@graphql-codegen/cli": "^2.6.2",
     "@graphql-tools/graphql-file-loader": "7.3.14",
     "@graphql-tools/load": "7.5.13",
     "apollo-server-express": "3.8.2",
