@@ -23,10 +23,16 @@ export type CreateOrderInput = {
 
 export type CreateUserRequest = {
   age?: InputMaybe<Scalars['Int']>;
-  full_name?: InputMaybe<Scalars['String']>;
+  full_name: Scalars['String'];
   gender?: InputMaybe<Scalars['String']>;
-  phone?: InputMaybe<Scalars['String']>;
+  phone: Scalars['String'];
 };
+
+export enum Gender {
+  Female = 'Female',
+  Male = 'Male',
+  Other = 'Other'
+}
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -95,7 +101,7 @@ export type UserResult = {
   _id?: Maybe<Scalars['ObjectID']>;
   age?: Maybe<Scalars['Int']>;
   full_name?: Maybe<Scalars['String']>;
-  gender?: Maybe<Scalars['String']>;
+  gender?: Maybe<Gender>;
   phone?: Maybe<Scalars['String']>;
 };
 
@@ -172,6 +178,7 @@ export type ResolversTypes = {
   CreateOrderInput: CreateOrderInput;
   CreateUserRequest: CreateUserRequest;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  Gender: Gender;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
   ObjectID: ResolverTypeWrapper<Scalars['ObjectID']>;
@@ -228,7 +235,7 @@ export type UserResultResolvers<ContextType = any, ParentType extends ResolversP
   _id?: Resolver<Maybe<ResolversTypes['ObjectID']>, ParentType, ContextType>;
   age?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   full_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  gender?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  gender?: Resolver<Maybe<ResolversTypes['Gender']>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

@@ -1,7 +1,8 @@
-import {Resolvers} from "../generated/graphql";
+import {OrderResult, Resolvers} from "../generated/graphql";
 import Users from "../models/users";
 import {ObjectIDResolver} from "graphql-scalars";
 import Orders from "../models/orders";
+import calculateAccruedAmount from "./order";
 
 const resolvers: Resolvers = {
   ObjectID: ObjectIDResolver,
@@ -10,10 +11,40 @@ const resolvers: Resolvers = {
       return await Users.UsersModel.findById(_id).exec()
     },
     async getOrderById(_, {_id}) {
-      return await Orders.OrdersModel.findById(_id).exec()
+      const order = await Orders.OrdersModel.findById(_id).exec()
+      if (!order) {
+        return {}
+      }
+
+      const monthSpan = new Date().getMonth() - new Date(order.createdAt).getMonth()
+      return {
+        _id: order._id,
+        user: order.user,
+        code: order.code,
+        age: order.age,
+        gender: order.gender,
+        interest_rate: order.interest_rate,
+        accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+      }
     },
     async getOrderByUser(_, {user}) {
-      return await Orders.OrdersModel.find({user: user}).exec()
+      const orders = await Orders.OrdersModel.find({user: user}).exec()
+      if (!orders) {
+        return []
+      }
+
+      return orders.map(order => {
+        const monthSpan = new Date().getMonth() - new Date(order.createdAt).getMonth()
+        return {
+          _id: order._id,
+          user: order.user,
+          code: order.code,
+          age: order.age,
+          gender: order.gender,
+          interest_rate: order.interest_rate,
+          accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+        }
+      })
     }
   },
   Mutation: {
