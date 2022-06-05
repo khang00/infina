@@ -1,0 +1,31 @@
+type UserResult {
+    _id: ObjectID
+    full_name: String
+    phone: String
+    age: Int
+    gender: String
+}
+
+input CreateUserRequest {
+    full_name: String
+    phone: String
+    age: Int
+    gender: String
+}
+
+input UpdateUserRequest {
+    _id: ObjectID!
+    full_name: String
+    phone: String
+    age: Int
+    gender: String
+}
+
+type Mutation {
+    createUser(user: CreateUserRequest!): UserResult
+    getUser(id: ObjectID): UserResult
+    updateUser(user: UpdateUserRequest): UserResult
+}
+type Query {
+    users: [UserResult]
+}

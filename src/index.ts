@@ -3,6 +3,8 @@ import express from "express";
 import {ApolloServer} from "apollo-server-express";
 import {GraphQLFileLoader} from "@graphql-tools/graphql-file-loader";
 import {loadSchema} from "@graphql-tools/load";
+import {addResolversToSchema} from "@graphql-tools/schema";
+import resolvers from "./resolvers";
 
 const port = 3000;
 mongoose.connect(
@@ -15,13 +17,9 @@ mongoose.connect(
       loaders: [new GraphQLFileLoader()]
     })
 
-    const resolvers = {
-      Query: {
-        hello: () => 'Hello world!',
-      },
-    };
+    const schemaWithResolver = addResolversToSchema({schema, resolvers})
 
-    const server = new ApolloServer({ schema, resolvers });
+    const server = new ApolloServer({schema: schemaWithResolver});
     const app = express();
     await server.start()
     server.applyMiddleware({ app });

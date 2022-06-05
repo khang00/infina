@@ -1,0 +1,22 @@
+type OrderResult {
+    id: ObjectID
+    user: ObjectID
+    code: String
+    amount: Int
+    interest_rate: Float
+    accrued_amount: [Int]
+}
+
+input CreateOrderInput {
+    user: ObjectID
+    amount: Int
+    interest_rate: Float
+}
+
+type Mutation {
+    createOrder(user: CreateOrderInput): OrderResult
+}
+
+type Query {
+    orders: [OrderResult]
+}
