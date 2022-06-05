@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const OrdersSchema = new mongoose.Schema({
+  user: String,
   full_name: String,
   code: String,
   amount: String,

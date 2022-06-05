@@ -23,9 +23,8 @@ input UpdateUserRequest {
 
 type Mutation {
     createUser(user: CreateUserRequest!): UserResult
-    getUser(id: ObjectID): UserResult
-    updateUser(user: UpdateUserRequest): UserResult
+    updateUser(user: UpdateUserRequest!): UserResult
 }
 type Query {
-    users: [UserResult]
+    user(_id: ObjectID!): UserResult
 }

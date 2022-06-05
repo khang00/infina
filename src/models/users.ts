@@ -6,7 +6,6 @@ const UsersSchema = new mongoose.Schema({
   phone: String,
   age: Number,
   gender: String,
-  orders: [Orders.OrdersSchema],
 });
 
 const UsersModel = mongoose.model("Users", UsersSchema);

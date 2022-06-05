@@ -16,9 +16,9 @@ export type Scalars = {
 };
 
 export type CreateOrderInput = {
-  amount?: InputMaybe<Scalars['Int']>;
-  interest_rate?: InputMaybe<Scalars['Float']>;
-  user?: InputMaybe<Scalars['ObjectID']>;
+  amount: Scalars['Int'];
+  interest_rate: Scalars['Float'];
+  user: Scalars['ObjectID'];
 };
 
 export type CreateUserRequest = {
@@ -32,13 +32,12 @@ export type Mutation = {
   __typename?: 'Mutation';
   createOrder?: Maybe<OrderResult>;
   createUser?: Maybe<UserResult>;
-  getUser?: Maybe<UserResult>;
   updateUser?: Maybe<UserResult>;
 };
 
 
 export type MutationCreateOrderArgs = {
-  user?: InputMaybe<CreateOrderInput>;
+  order: CreateOrderInput;
 };
 
 
@@ -47,29 +46,40 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationGetUserArgs = {
-  id?: InputMaybe<Scalars['ObjectID']>;
-};
-
-
 export type MutationUpdateUserArgs = {
-  user?: InputMaybe<UpdateUserRequest>;
+  user: UpdateUserRequest;
 };
 
 export type OrderResult = {
   __typename?: 'OrderResult';
+  _id?: Maybe<Scalars['ObjectID']>;
   accrued_amount?: Maybe<Array<Maybe<Scalars['Int']>>>;
   amount?: Maybe<Scalars['Int']>;
   code?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['ObjectID']>;
   interest_rate?: Maybe<Scalars['Float']>;
   user?: Maybe<Scalars['ObjectID']>;
 };
 
 export type Query = {
   __typename?: 'Query';
-  orders?: Maybe<Array<Maybe<OrderResult>>>;
-  users?: Maybe<Array<Maybe<UserResult>>>;
+  getOrderById?: Maybe<OrderResult>;
+  getOrderByUser?: Maybe<Array<Maybe<OrderResult>>>;
+  user?: Maybe<UserResult>;
+};
+
+
+export type QueryGetOrderByIdArgs = {
+  _id: Scalars['ObjectID'];
+};
+
+
+export type QueryGetOrderByUserArgs = {
+  user: Scalars['ObjectID'];
+};
+
+
+export type QueryUserArgs = {
+  _id: Scalars['ObjectID'];
 };
 
 export type UpdateUserRequest = {
@@ -189,10 +199,9 @@ export type ResolversParentTypes = {
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createOrder?: Resolver<Maybe<ResolversTypes['OrderResult']>, ParentType, ContextType, Partial<MutationCreateOrderArgs>>;
+  createOrder?: Resolver<Maybe<ResolversTypes['OrderResult']>, ParentType, ContextType, RequireFields<MutationCreateOrderArgs, 'order'>>;
   createUser?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'user'>>;
-  getUser?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, Partial<MutationGetUserArgs>>;
-  updateUser?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, Partial<MutationUpdateUserArgs>>;
+  updateUser?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'user'>>;
 };
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectID'], any> {
@@ -200,18 +209,19 @@ export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 }
 
 export type OrderResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['OrderResult'] = ResolversParentTypes['OrderResult']> = {
+  _id?: Resolver<Maybe<ResolversTypes['ObjectID']>, ParentType, ContextType>;
   accrued_amount?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
   amount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ObjectID']>, ParentType, ContextType>;
   interest_rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['ObjectID']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  orders?: Resolver<Maybe<Array<Maybe<ResolversTypes['OrderResult']>>>, ParentType, ContextType>;
-  users?: Resolver<Maybe<Array<Maybe<ResolversTypes['UserResult']>>>, ParentType, ContextType>;
+  getOrderById?: Resolver<Maybe<ResolversTypes['OrderResult']>, ParentType, ContextType, RequireFields<QueryGetOrderByIdArgs, '_id'>>;
+  getOrderByUser?: Resolver<Maybe<Array<Maybe<ResolversTypes['OrderResult']>>>, ParentType, ContextType, RequireFields<QueryGetOrderByUserArgs, 'user'>>;
+  user?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType, RequireFields<QueryUserArgs, '_id'>>;
 };
 
 export type UserResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserResult'] = ResolversParentTypes['UserResult']> = {

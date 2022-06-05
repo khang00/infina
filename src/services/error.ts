@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-const databaseErrorHandler = (err: mongoose.Error, obj :any) => {
+const databaseErrorHandler = (err: mongoose.Error) => {
   if (err) {
-    console.log(err, obj)
+    console.log(err)
   }
 }
 

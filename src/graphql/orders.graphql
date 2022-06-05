@@ -1,5 +1,5 @@
 type OrderResult {
-    id: ObjectID
+    _id: ObjectID
     user: ObjectID
     code: String
     amount: Int
@@ -8,15 +8,16 @@ type OrderResult {
 }
 
 input CreateOrderInput {
-    user: ObjectID
-    amount: Int
-    interest_rate: Float
+    user: ObjectID!
+    amount: Int!
+    interest_rate: Float!
 }
 
 type Mutation {
-    createOrder(user: CreateOrderInput): OrderResult
+    createOrder(order: CreateOrderInput!): OrderResult
 }
 
 type Query {
-    orders: [OrderResult]
+    getOrderByUser(user: ObjectID!): [OrderResult]
+    getOrderById(_id: ObjectID!): OrderResult
 }
