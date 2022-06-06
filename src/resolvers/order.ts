@@ -2,6 +2,8 @@ import Users from "../models/users";
 import {UserInputError} from "apollo-server-express";
 import Orders from "../models/orders";
 import {MutationCreateOrderArgs, QueryGetOrderByIdArgs, QueryGetOrderByUserArgs} from "../generated/graphql";
+import constant from "./constant";
+import mongoose from "mongoose";
 
 const createOrder = async <Parent = {}>(_: Parent, {order}: MutationCreateOrderArgs) => {
   const user = await Users.UsersModel.findById(order.user).exec()
@@ -14,7 +16,7 @@ const createOrder = async <Parent = {}>(_: Parent, {order}: MutationCreateOrderA
   return {
     _id: createdOrder._id,
     user: createdOrder.user,
-    code: createdOrder.code,
+    code: await genCode(constant.CodeGenSize),
     age: createdOrder.age,
     gender: createdOrder.gender,
     interest_rate: order.interest_rate,
@@ -79,4 +81,17 @@ const calculateInterest = (amount: number, interestRate: number) => {
   return Math.round(amount * interestRate)
 }
 
-export default {calculateAccruedAmount, createOrder, getOrderByUser, getOrderById}
+const genCode = async (size: number) => {
+  const ordersCount = await Orders.OrdersModel.find().estimatedDocumentCount()
+  const ordersCountStr = ordersCount.toString()
+  if (size - ordersCountStr.length > 0) {
+    const randomDigits = Array(size - ordersCountStr.length).fill(0).map(_ => Math.floor(Math.random()))
+    return randomDigits.toString() + ordersCountStr
+  } else {
+    const randomDigits = Array(size).fill(0).map(_ => Math.floor(Math.random()))
+    return randomDigits.toString()
+  }
+}
+
+
+export default {createOrder, getOrderByUser, getOrderById}

@@ -24,4 +24,4 @@ const user = async <Parent = {}>(_: Parent, {_id}: QueryUserArgs) => {
 
 const validatePhoneNumber = (phone: string) => /^\d{10}$/.test(phone)
 
-export default {validatePhoneNumber, createUser, updateUser, user}
+export default {createUser, updateUser, user}
