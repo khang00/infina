@@ -3,7 +3,6 @@ import {UserInputError} from "apollo-server-express";
 import Orders from "../models/orders";
 import {MutationCreateOrderArgs, QueryGetOrderByIdArgs, QueryGetOrderByUserArgs} from "../generated/graphql";
 import constant from "./constant";
-import mongoose from "mongoose";
 
 const createOrder = async <Parent = {}>(_: Parent, {order}: MutationCreateOrderArgs) => {
   const user = await Users.UsersModel.findById(order.user).exec()
@@ -80,7 +79,17 @@ const calculateInterest = (amount: number, interestRate: number) => {
   console.log(amount, interestRate, amount * interestRate)
   return Math.round(amount * interestRate)
 }
-
+/**
+ * Returns a random unique code.
+ *
+ * @remarks
+ * the function use current number of order in a collection for the unique part and
+ * use random function to generate the random part
+ *
+ * @param size - The length of the code to be generated
+ * @returns The randomly generated unique code with length of size
+ *
+ */
 const genCode = async (size: number) => {
   const ordersCount = await Orders.OrdersModel.find().estimatedDocumentCount()
   const ordersCountStr = ordersCount.toString()

@@ -22,6 +22,16 @@ const user = async <Parent = {}>(_: Parent, {_id}: QueryUserArgs) => {
   return await Users.UsersModel.findById(_id).exec()
 }
 
-const validatePhoneNumber = (phone: string) => /^\d{10}$/.test(phone)
+/**
+ * Validate if a phone have a VietNam phone format
+ *
+ * @remarks
+ * The phone is correct if it has 10 number and start with "09"
+ *
+ * @param phone - The phone number to be validated
+ * @returns whether the phone is correct
+ *
+ */
+const validatePhoneNumber = (phone: string) => /^09\d{8}$/.test(phone)
 
 export default {createUser, updateUser, user}
