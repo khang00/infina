@@ -1,3 +1,65 @@
+import Users from "../models/users";
+import {UserInputError} from "apollo-server-express";
+import Orders from "../models/orders";
+import {MutationCreateOrderArgs, QueryGetOrderByIdArgs, QueryGetOrderByUserArgs} from "../generated/graphql";
+
+const createOrder = async <Parent = {}>(_: Parent, {order}: MutationCreateOrderArgs) => {
+  const user = await Users.UsersModel.findById(order.user).exec()
+  if (!user) {
+    throw new UserInputError("user not exist" + order.user)
+  }
+
+  const createdOrder = await Orders.OrdersModel.create(order)
+  const monthSpan = new Date().getMonth() - new Date(createdOrder.createdAt).getMonth()
+  return {
+    _id: createdOrder._id,
+    user: createdOrder.user,
+    code: createdOrder.code,
+    age: createdOrder.age,
+    gender: createdOrder.gender,
+    interest_rate: order.interest_rate,
+    accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+  }
+}
+
+const getOrderByUser = async <Parent = {}>(_: Parent, {user}: QueryGetOrderByUserArgs) => {
+  const orders = await Orders.OrdersModel.find({user: user}).exec()
+  if (!orders) {
+    throw new UserInputError("not found oder for user" + user)
+  }
+
+  return orders.map(order => {
+    const monthSpan = new Date().getMonth() - new Date(order.createdAt).getMonth()
+    return {
+      _id: order._id,
+      user: order.user,
+      code: order.code,
+      age: order.age,
+      gender: order.gender,
+      interest_rate: order.interest_rate,
+      accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+    }
+  })
+}
+
+const getOrderById = async <Parent = {}>(_: Parent, {_id}: QueryGetOrderByIdArgs) => {
+  const order = await Orders.OrdersModel.findById(_id).exec()
+  if (!order) {
+    throw new UserInputError("not found oder for id" + _id)
+  }
+
+  const monthSpan = new Date().getMonth() - new Date(order.createdAt).getMonth()
+  return {
+    _id: order._id,
+    user: order.user,
+    code: order.code,
+    age: order.age,
+    gender: order.gender,
+    interest_rate: order.interest_rate,
+    accrued_amount: calculateAccruedAmount(order.amount, order.interest_rate, monthSpan)
+  }
+}
+
 const calculateAccruedAmount = (amount: number, interestRatePerYear: number, numberOfMonth: number) => {
   const interestRatePerMonth = interestRatePerYear / 12
 
@@ -17,4 +79,4 @@ const calculateInterest = (amount: number, interestRate: number) => {
   return Math.round(amount * interestRate)
 }
 
-export default calculateAccruedAmount
+export default {calculateAccruedAmount, createOrder, getOrderByUser, getOrderById}
